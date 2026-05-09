@@ -3,76 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Dashboard OQ</title>
-
+<title>Dashboard OQ Confipetrol</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#0b2340;
-  color:#fff;
-  padding:20px;
-}
-
-h1{
-  text-align:center;
-  margin-bottom:30px;
-}
-
-.cards{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
-  margin-bottom:30px;
-}
-
-.card{
-  background:#fff;
-  color:#111;
-  padding:25px;
-  border-radius:16px;
-  text-align:center;
-  box-shadow:0 10px 20px rgba(0,0,0,.25);
-}
-
-.card h2{
-  margin:0;
-  font-size:18px;
-}
-
-.card .valor{
-  font-size:42px;
-  font-weight:bold;
-  margin-top:15px;
-}
-
-.graficas{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
-}
-
-.box{
-  background:#fff;
-  border-radius:16px;
-  padding:20px;
-}
-
-canvas{
-  width:100% !important;
-  height:400px !important;
-}
-
-@media(max-width:900px){
-  .graficas{
-    grid-template-columns:1fr;
-  }
-}
-
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b2340;color:#fff;padding:20px}
+h1{text-align:center;margin:10px 0 25px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}
+.card{background:#fff;color:#111;padding:18px;border-radius:14px;text-align:center;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.card:hover{transform:scale(1.02)}
+.card h2{font-size:15px;margin:0}
+.valor{font-size:34px;font-weight:bold;margin-top:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:25px}
+.box{background:#fff;color:#111;border-radius:14px;padding:18px}
+canvas{width:100%!important;height:330px!important}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:15px}
+input,select{padding:10px;border-radius:8px;border:1px solid #ccc;width:100%}
+table{width:100%;border-collapse:collapse;background:#fff;color:#111;border-radius:12px;overflow:hidden}
+th,td{border:1px solid #ddd;padding:8px;font-size:13px;text-align:left}
+th{background:#0b2340;color:#fff}
+.badge{padding:4px 8px;border-radius:8px;font-weight:bold}
+.VIGENTE{background:#c8f7c5}
+.VENCIDA{background:#ffc7c7}
+.PENDIENTE{background:#ddd}
+.PROXIMA{background:#fff3b0}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 
@@ -81,130 +36,206 @@ canvas{
 <h1>DASHBOARD OQ CONFIPETROL</h1>
 
 <div class="cards">
-
-  <div class="card">
-    <h2>% Cumplimiento</h2>
-    <div class="valor" id="porcentaje">0%</div>
-  </div>
-
-  <div class="card">
-    <h2>Registros</h2>
-    <div class="valor" id="total">0</div>
-  </div>
-
-  <div class="card">
-    <h2>Vigentes</h2>
-    <div class="valor" id="vigente">0</div>
-  </div>
-
-  <div class="card">
-    <h2>Vencidas</h2>
-    <div class="valor" id="vencida">0</div>
-  </div>
-
-  <div class="card">
-    <h2>Pendientes</h2>
-    <div class="valor" id="pendiente">0</div>
-  </div>
-
+  <div class="card" onclick="filtrarEstado('')"><h2>% Cumplimiento</h2><div class="valor" id="porcentaje">0%</div></div>
+  <div class="card" onclick="filtrarEstado('')"><h2>Total registros</h2><div class="valor" id="total">0</div></div>
+  <div class="card" onclick="filtrarEstado('VIGENTE')"><h2>Vigentes</h2><div class="valor" id="vigente">0</div></div>
+  <div class="card" onclick="filtrarEstado('VENCIDA')"><h2>Vencidas</h2><div class="valor" id="vencida">0</div></div>
+  <div class="card" onclick="filtrarEstado('PENDIENTE')"><h2>Pendientes</h2><div class="valor" id="pendiente">0</div></div>
+  <div class="card" onclick="filtrarEstado('PROXIMA A VENCER')"><h2>Próximas</h2><div class="valor" id="proxima">0</div></div>
 </div>
 
-<div class="graficas">
-
+<div class="grid">
   <div class="box">
+    <h3>Estados de cumplimiento</h3>
     <canvas id="graficaEstados"></canvas>
   </div>
 
   <div class="box">
+    <h3>% cumplimiento por cargo</h3>
     <canvas id="graficaCargos"></canvas>
   </div>
+</div>
 
+<div class="grid">
+  <div class="box">
+    <h3>Top 10 capacitaciones más pendientes</h3>
+    <canvas id="graficaTareas"></canvas>
+  </div>
+
+  <div class="box">
+    <h3>Top 10 técnicos con más pendientes</h3>
+    <canvas id="graficaTecnicos"></canvas>
+  </div>
+</div>
+
+<div class="box">
+  <h3>Detalle interactivo</h3>
+
+  <div class="filters">
+    <input id="buscar" placeholder="Buscar técnico, tarea o cargo..." oninput="renderTabla()">
+    <select id="filtroCargo" onchange="renderTabla()">
+      <option value="">Todos los cargos</option>
+    </select>
+    <select id="filtroEstado" onchange="renderTabla()">
+      <option value="">Todos los estados</option>
+      <option value="VIGENTE">Vigente</option>
+      <option value="VENCIDA">Vencida</option>
+      <option value="PENDIENTE">Pendiente</option>
+      <option value="PROXIMA A VENCER">Próxima a vencer</option>
+    </select>
+    <select id="filtroCumple" onchange="renderTabla()">
+      <option value="">Cumple / No cumple</option>
+      <option value="SI">Cumple</option>
+      <option value="NO">No cumple</option>
+    </select>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Cargo</th>
+        <th>ID Tarea</th>
+        <th>Tarea</th>
+        <th>Cumple</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+        <th>Certificado</th>
+      </tr>
+    </thead>
+    <tbody id="tabla"></tbody>
+  </table>
 </div>
 
 <script>
-
 const API = "https://script.google.com/macros/s/AKfycbxbzO1J8Dl0v4_NZ624FL9U7i4uIZzFhztAft7eyOWyQoGdR59VCxlpjUwrmgbIkZcKYA/exec";
+
+let detallesGlobal = [];
 
 fetch(API + "?dashboard=cumplimiento")
 .then(r => r.json())
 .then(data => {
+  detallesGlobal = data.detalles || [];
 
-  document.getElementById("porcentaje").textContent =
-    data.porcentajeGeneral + "%";
+  document.getElementById("porcentaje").textContent = data.porcentajeGeneral + "%";
+  document.getElementById("total").textContent = data.total;
+  document.getElementById("vigente").textContent = data.vigente;
+  document.getElementById("vencida").textContent = data.vencida;
+  document.getElementById("pendiente").textContent = data.pendiente;
+  document.getElementById("proxima").textContent = data.proxima;
 
-  document.getElementById("total").textContent =
-    data.total;
-
-  document.getElementById("vigente").textContent =
-    data.vigente;
-
-  document.getElementById("vencida").textContent =
-    data.vencida;
-
-  document.getElementById("pendiente").textContent =
-    data.pendiente;
-
-  // GRAFICA ESTADOS
-
-  new Chart(document.getElementById("graficaEstados"), {
-
-    type:'doughnut',
-
-    data:{
-      labels:[
-        'Vigentes',
-        'Vencidas',
-        'Pendientes',
-        'Próximas'
-      ],
-
-      datasets:[{
-        data:[
-          data.vigente,
-          data.vencida,
-          data.pendiente,
-          data.proxima
-        ]
-      }]
-    }
-
-  });
-
-  // GRAFICA CARGOS
-
-  const cargos = data.cargos || [];
-
-  new Chart(document.getElementById("graficaCargos"), {
-
-    type:'bar',
-
-    data:{
-      labels:cargos.map(c => c.cargo),
-
-      datasets:[{
-        label:'% Cumplimiento',
-        data:cargos.map(c => c.porcentaje)
-      }]
-    },
-
-    options:{
-      responsive:true,
-      scales:{
-        y:{
-          beginAtZero:true,
-          max:100
-        }
-      }
-    }
-
-  });
-
+  cargarCargos(detallesGlobal);
+  graficas(data);
+  renderTabla();
 })
 .catch(err => {
   console.error(err);
-  alert("No fue posible cargar dashboard.");
+  alert("No fue posible cargar el dashboard.");
 });
 
+function cargarCargos(detalles){
+  const select = document.getElementById("filtroCargo");
+  const cargos = [...new Set(detalles.map(d => d.cargo).filter(Boolean))].sort();
+
+  cargos.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    select.appendChild(opt);
+  });
+}
+
+function filtrarEstado(estado){
+  document.getElementById("filtroEstado").value = estado;
+  renderTabla();
+  window.scrollTo({top: document.body.scrollHeight, behavior:"smooth"});
+}
+
+function renderTabla(){
+  const buscar = document.getElementById("buscar").value.toLowerCase();
+  const cargo = document.getElementById("filtroCargo").value;
+  const estado = document.getElementById("filtroEstado").value;
+  const cumple = document.getElementById("filtroCumple").value;
+
+  const tbody = document.getElementById("tabla");
+  tbody.innerHTML = "";
+
+  const filtrados = detallesGlobal.filter(d => {
+    const texto = `${d.nombre} ${d.cargo} ${d.tarea}`.toLowerCase();
+
+    return (!buscar || texto.includes(buscar)) &&
+           (!cargo || d.cargo === cargo) &&
+           (!estado || d.estado === estado) &&
+           (!cumple || d.cumple === cumple);
+  });
+
+  filtrados.forEach(d => {
+    const cert = d.certificado
+      ? `<a href="${d.certificado}" target="_blank">Ver</a>`
+      : "—";
+
+    const clase = d.estado === "PROXIMA A VENCER" ? "PROXIMA" : d.estado;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${d.nombre}</td>
+      <td>${d.cargo}</td>
+      <td>${d.idTarea}</td>
+      <td>${d.tarea}</td>
+      <td>${d.cumple}</td>
+      <td>${d.fecha || "—"}</td>
+      <td><span class="badge ${clase}">${d.estado}</span></td>
+      <td>${cert}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function graficas(data){
+  new Chart(document.getElementById("graficaEstados"), {
+    type:"doughnut",
+    data:{
+      labels:["Vigentes","Vencidas","Pendientes","Próximas"],
+      datasets:[{
+        data:[data.vigente,data.vencida,data.pendiente,data.proxima]
+      }]
+    }
+  });
+
+  new Chart(document.getElementById("graficaCargos"), {
+    type:"bar",
+    data:{
+      labels:data.cargos.map(c => c.cargo),
+      datasets:[{
+        label:"% Cumplimiento",
+        data:data.cargos.map(c => c.porcentaje)
+      }]
+    },
+    options:{scales:{y:{beginAtZero:true,max:100}}}
+  });
+
+  new Chart(document.getElementById("graficaTareas"), {
+    type:"bar",
+    data:{
+      labels:data.topTareasPendientes.map(t => t.tarea),
+      datasets:[{
+        label:"Pendientes",
+        data:data.topTareasPendientes.map(t => t.total)
+      }]
+    }
+  });
+
+  new Chart(document.getElementById("graficaTecnicos"), {
+    type:"bar",
+    data:{
+      labels:data.topTecnicosPendientes.map(t => t.nombre),
+      datasets:[{
+        label:"Pendientes",
+        data:data.topTecnicosPendientes.map(t => t.total)
+      }]
+    }
+  });
+}
 </script>
 
 </body>
