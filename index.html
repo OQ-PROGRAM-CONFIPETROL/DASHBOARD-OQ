@@ -81,6 +81,64 @@ th{background:#0b2340;color:#fff}
   border-radius:12px;
   box-shadow:0 8px 20px rgba(0,0,0,.25);
 }
+.ranking{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.rankItem{
+  background:#f4f7fb;
+  border-left:6px solid #0b2340;
+  padding:10px 12px;
+  border-radius:10px;
+  font-size:14px;
+}
+
+.rankItem strong{
+  display:block;
+  font-size:14px;
+  margin-bottom:4px;
+}
+
+.rankItem span{
+  font-size:13px;
+  color:#333;
+}
+
+@media(max-width:700px){
+  body{
+    padding:10px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .card{
+    padding:12px;
+  }
+
+  .valor{
+    font-size:24px;
+  }
+
+  .rankItem{
+    font-size:12px;
+  }
+
+  .rankItem strong{
+    font-size:12px;
+  }
+
+  .rankItem span{
+    font-size:11px;
+  }
+}
   
 </style>
 </head>
@@ -126,20 +184,12 @@ th{background:#0b2340;color:#fff}
 <div class="grid">
   <div class="box">
     <h3>Top 10 capacitaciones más pendientes</h3>
-<div class="chartBox">
-<div class="chartBox">
-  <canvas id="graficaTareas"></canvas>
-</div>
-</div>
+    <div id="listaTareasPendientes" class="ranking"></div>
   </div>
 
   <div class="box">
     <h3>Top 10 técnicos con más pendientes</h3>
-<div class="chartBox">
-<div class="chartBox">
-  <canvas id="graficaTecnicos"></canvas>
-</div>
-</div>
+    <div id="listaTecnicosPendientes" class="ranking"></div>
   </div>
 </div>
 
@@ -200,8 +250,9 @@ fetch(API + "?dashboard=cumplimiento")
   document.getElementById("proxima").textContent = data.proxima;
 
   cargarCargos(detallesGlobal);
-  graficas(data);
-  renderTabla();
+graficas(data);
+renderRankings(data);
+renderTabla();
 })
 .catch(err => {
   console.error(err);
@@ -266,6 +317,31 @@ function renderTabla(){
   });
 }
 
+  function renderRankings(data){
+  const listaTareas = document.getElementById("listaTareasPendientes");
+  const listaTecnicos = document.getElementById("listaTecnicosPendientes");
+
+  listaTareas.innerHTML = "";
+  listaTecnicos.innerHTML = "";
+
+  (data.topTareasPendientes || []).forEach((item, index) => {
+    listaTareas.innerHTML += `
+      <div class="rankItem">
+        <strong>${index + 1}. ${item.tarea}</strong>
+        <span>${item.total} pendientes</span>
+      </div>
+    `;
+  });
+
+  (data.topTecnicosPendientes || []).forEach((item, index) => {
+    listaTecnicos.innerHTML += `
+      <div class="rankItem">
+        <strong>${index + 1}. ${item.nombre}</strong>
+        <span>${item.total} pendientes</span>
+      </div>
+    `;
+  });
+}
 function graficas(data){
   new Chart(document.getElementById("graficaEstados"), {
     type:"doughnut",
@@ -289,27 +365,7 @@ function graficas(data){
     options:{scales:{y:{beginAtZero:true,max:100}}}
   });
 
-  new Chart(document.getElementById("graficaTareas"), {
-    type:"bar",
-    data:{
-      labels:data.topTareasPendientes.map(t => t.tarea),
-      datasets:[{
-        label:"Pendientes",
-        data:data.topTareasPendientes.map(t => t.total)
-      }]
-    }
-  });
 
-  new Chart(document.getElementById("graficaTecnicos"), {
-    type:"bar",
-    data:{
-      labels:data.topTecnicosPendientes.map(t => t.nombre),
-      datasets:[{
-        label:"Pendientes",
-        data:data.topTecnicosPendientes.map(t => t.total)
-      }]
-    }
-  });
 }
 </script>
 
