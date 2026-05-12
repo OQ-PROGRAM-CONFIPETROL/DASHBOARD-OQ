@@ -223,9 +223,10 @@ th{background:#0b2340;color:#fff}
         <th>ID Tarea</th>
         <th>Tarea</th>
         <th>Cumple</th>
-        <th>Fecha</th>
-        <th>Estado</th>
-        <th>Certificado</th>
+<th>Fecha</th>
+<th>Vence</th>
+<th>Estado</th>
+<th>Certificado</th>
       </tr>
     </thead>
     <tbody id="tabla"></tbody>
@@ -309,9 +310,10 @@ function renderTabla(){
       <td>${d.idTarea}</td>
       <td>${d.tarea}</td>
       <td>${d.cumple}</td>
-      <td>${d.fecha || "—"}</td>
-      <td><span class="badge ${clase}">${d.estado}</span></td>
-      <td>${cert}</td>
+<td>${d.fecha || "—"}</td>
+<td>${d.fechaVencimiento || "—"}</td>
+<td><span class="badge ${clase}">${d.estado}</span></td>
+<td>${cert}</td>
     `;
     tbody.appendChild(tr);
   });
