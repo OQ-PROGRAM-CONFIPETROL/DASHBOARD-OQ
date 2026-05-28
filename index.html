@@ -1,155 +1,118 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard OQ Confipetrol</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard OQ Confipetrol</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b2340;color:#fff;padding:20px}
-h1{text-align:center;margin:10px 0 25px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}
-.card{background:#fff;color:#111;padding:18px;border-radius:14px;text-align:center;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.25)}
-.card:hover{transform:scale(1.02)}
-.card h2{font-size:15px;margin:0}
-.valor{font-size:34px;font-weight:bold;margin-top:10px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:25px}
-.box{background:#fff;color:#111;border-radius:14px;padding:18px}
-.chartBox{
-  position:relative;
-  width:100%;
-  min-height:420px;
-}
+  <style>
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b2340;color:#fff;padding:20px}
+    h1{text-align:center;margin:10px 0 25px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}
+    .card{background:#fff;color:#111;padding:18px;border-radius:14px;text-align:center;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.25);transition: transform 0.2s;}
+    .card:hover{transform:scale(1.02)}
+    .card h2{font-size:15px;margin:0}
+    .valor{font-size:34px;font-weight:bold;margin-top:10px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:25px}
+    .box{background:#fff;color:#111;border-radius:14px;padding:18px}
+    
+    .chartBox{
+      position:relative;
+      width:100%;
+      min-height:340px;
+    }
 
-canvas{
-  width:100%!important;
-  height:420px!important;
-}
+    canvas{
+      width:100%!important;
+      height:340px!important;
+    }
 
-@media(max-width:700px){
+    @media(max-width:700px){
+      .box{padding:14px;}
+      .chartBox{min-height:300px;}
+      canvas{height:300px!important;}
+      h1{font-size:22px;}
+      .card .valor{font-size:28px;}
+      th, td{font-size:11px;padding:6px;}
+    }
 
-  .box{
-    padding:14px;
-  }
+    .filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:15px}
+    input,select{padding:10px;border-radius:8px;border:1px solid #ccc;width:100%;box-sizing:border-box}
+    
+    .table-container { width: 100%; overflow-x: auto; }
+    table{width:100%;border-collapse:collapse;background:#fff;color:#111;border-radius:12px;overflow:hidden}
+    th,td{border:1px solid #ddd;padding:8px;font-size:13px;text-align:left}
+    th{background:#0b2340;color:#fff}
+    
+    /* Estilos Corregidos de Badges para Contraste */
+    .badge{padding:4px 8px;border-radius:8px;font-weight:bold;display:inline-block;color:#111}
+    .VIGENTE{background:#c8f7c5;color:#1e4620}
+    .VENCIDA{background:#ffc7c7;color:#7a1c1c}
+    .PENDIENTE{background:#ddd;color:#444}
+    .PROXIMA{background:#fff3b0;color:#7a6500}
+    
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    
+    .logoBox{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      margin:10px auto 20px auto;
+    }
 
-  .chartBox{
-    min-height:520px;
-  }
+    .logoBox img{
+      max-width:260px;
+      width:100%;
+      height:auto;
+      background:#fff;
+      padding:12px;
+      border-radius:12px;
+      box-shadow:0 8px 20px rgba(0,0,0,.25);
+    }
+    
+    .ranking{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
 
-  canvas{
-    height:520px!important;
-  }
+    .rankItem{
+      background:#f4f7fb;
+      border-left:6px solid #0b2340;
+      padding:10px 12px;
+      border-radius:10px;
+      font-size:14px;
+    }
 
-  h1{
-    font-size:22px;
-  }
+    .rankItem strong{
+      display:block;
+      font-size:14px;
+      margin-bottom:4px;
+    }
 
-  .card .valor{
-    font-size:28px;
-  }
+    .rankItem span{
+      font-size:13px;
+      color:#333;
+    }
 
-  th, td{
-    font-size:11px;
-    padding:6px;
-  }
-}
-.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:15px}
-input,select{padding:10px;border-radius:8px;border:1px solid #ccc;width:100%}
-table{width:100%;border-collapse:collapse;background:#fff;color:#111;border-radius:12px;overflow:hidden}
-th,td{border:1px solid #ddd;padding:8px;font-size:13px;text-align:left}
-th{background:#0b2340;color:#fff}
-.badge{padding:4px 8px;border-radius:8px;font-weight:bold}
-.VIGENTE{background:#c8f7c5}
-.VENCIDA{background:#ffc7c7}
-.PENDIENTE{background:#ddd}
-.PROXIMA{background:#fff3b0}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-.logoBox{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin:10px auto 20px auto;
-}
-
-.logoBox img{
-  max-width:260px;
-  width:100%;
-  height:auto;
-  background:#fff;
-  padding:12px;
-  border-radius:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,.25);
-}
-.ranking{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.rankItem{
-  background:#f4f7fb;
-  border-left:6px solid #0b2340;
-  padding:10px 12px;
-  border-radius:10px;
-  font-size:14px;
-}
-
-.rankItem strong{
-  display:block;
-  font-size:14px;
-  margin-bottom:4px;
-}
-
-.rankItem span{
-  font-size:13px;
-  color:#333;
-}
-
-@media(max-width:700px){
-  body{
-    padding:10px;
-  }
-
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .cards{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .card{
-    padding:12px;
-  }
-
-  .valor{
-    font-size:24px;
-  }
-
-  .rankItem{
-    font-size:12px;
-  }
-
-  .rankItem strong{
-    font-size:12px;
-  }
-
-  .rankItem span{
-    font-size:11px;
-  }
-}
-  
-</style>
+    @media(max-width:700px){
+      body{padding:10px;}
+      .grid{grid-template-columns:1fr;}
+      .cards{grid-template-columns:repeat(2,1fr);}
+      .card{padding:12px;}
+      .valor{font-size:24px;}
+      .rankItem{font-size:12px;}
+      .rankItem strong{font-size:12px;}
+      .rankItem span{font-size:11px;}
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="logoBox">
-  <img 
-    src="imagen confi (1).png"
-    alt="CONFIPETROL"
-  >
+  <img src="imagen confi (1).png" alt="CONFIPETROL">
 </div>
 
 <h1>DASHBOARD OQ CONFIPETROL</h1>
@@ -166,18 +129,16 @@ th{background:#0b2340;color:#fff}
 <div class="grid">
   <div class="box">
     <h3>Estados de cumplimiento</h3>
-<div class="chartBox">
-  <canvas id="graficaEstados"></canvas>
-</div>
+    <div class="chartBox">
+      <canvas id="graficaEstados"></canvas>
+    </div>
   </div>
 
   <div class="box">
     <h3>% cumplimiento por cargo</h3>
-<div class="chartBox">
-<div class="chartBox">
-  <canvas id="graficaCargos"></canvas>
-</div>
-</div>
+    <div class="chartBox">
+      <canvas id="graficaCargos"></canvas>
+    </div>
   </div>
 </div>
 
@@ -215,49 +176,63 @@ th{background:#0b2340;color:#fff}
     </select>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Cargo</th>
-        <th>ID Tarea</th>
-        <th>Tarea</th>
-        <th>Cumple</th>
-<th>Fecha</th>
-<th>Vence</th>
-<th>Estado</th>
-<th>Certificado</th>
-      </tr>
-    </thead>
-    <tbody id="tabla"></tbody>
-  </table>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Cargo</th>
+          <th>ID Tarea</th>
+          <th>Tarea</th>
+          <th>Cumple</th>
+          <th>Fecha</th>
+          <th>Vence</th>
+          <th>Estado</th>
+          <th>Certificado</th>
+        </tr>
+      </thead>
+      <tbody id="tabla"></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
+// URL del Web App de Google Apps Script
 const API = "https://script.google.com/macros/s/AKfycbxbzO1J8Dl0v4_NZ624FL9U7i4uIZzFhztAft7eyOWyQoGdR59VCxlpjUwrmgbIkZcKYA/exec";
 
 let detallesGlobal = [];
+let chartEstados = null;
+let chartCargos = null;
 
+// Carga de datos inicial desde la API
 fetch(API + "?dashboard=cumplimiento")
-.then(r => r.json())
+.then(r => {
+  if(!r.ok) throw new Error("Error en respuesta de red.");
+  return r.json();
+})
 .then(data => {
+  if(data.error) {
+    alert("Error desde el servidor: " + data.error);
+    return;
+  }
+
   detallesGlobal = data.detalles || [];
 
-  document.getElementById("porcentaje").textContent = data.porcentajeGeneral + "%";
-  document.getElementById("total").textContent = data.total;
-  document.getElementById("vigente").textContent = data.vigente;
-  document.getElementById("vencida").textContent = data.vencida;
-  document.getElementById("pendiente").textContent = data.pendiente;
-  document.getElementById("proxima").textContent = data.proxima;
+  document.getElementById("porcentaje").textContent = (data.porcentajeGeneral || 0) + "%";
+  document.getElementById("total").textContent = data.total || 0;
+  document.getElementById("vigente").textContent = data.vigente || 0;
+  document.getElementById("vencida").textContent = data.vencida || 0;
+  document.getElementById("pendiente").textContent = data.pendiente || 0;
+  document.getElementById("proxima").textContent = data.proxima || 0;
 
   cargarCargos(detallesGlobal);
-graficas(data);
-renderRankings(data);
-renderTabla();
+  graficas(data);
+  renderRankings(data);
+  renderTabla();
 })
 .catch(err => {
-  console.error(err);
-  alert("No fue posible cargar el dashboard.");
+  console.error("Detalles del error: ", err);
+  alert("No fue posible cargar el dashboard. Verifica la consola o vuelve a implementar el script.");
 });
 
 function cargarCargos(detalles){
@@ -297,8 +272,8 @@ function renderTabla(){
   });
 
   filtrados.forEach(d => {
-    const cert = d.certificado
-      ? `<a href="${d.certificado}" target="_blank">Ver</a>`
+    const cert = d.certified || d.certificado
+      ? `<a href="${d.certified || d.certificado}" target="_blank" style="color:#0b2340; font-weight:bold;">Ver</a>`
       : "—";
 
     const clase = d.estado === "PROXIMA A VENCER" ? "PROXIMA" : d.estado;
@@ -309,17 +284,17 @@ function renderTabla(){
       <td>${d.cargo}</td>
       <td>${d.idTarea}</td>
       <td>${d.tarea}</td>
-      <td>${d.cumple}</td>
-<td>${d.fecha || "—"}</td>
-<td>${d.fechaVencimiento || "—"}</td>
-<td><span class="badge ${clase}">${d.estado}</span></td>
-<td>${cert}</td>
+      <td><strong>${d.cumple}</strong></td>
+      <td>${d.fecha || "—"}</td>
+      <td>${d.fechaVencimiento || "—"}</td>
+      <td><span class="badge ${clase}">${d.estado}</span></td>
+      <td>${cert}</td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-  function renderRankings(data){
+function renderRankings(data){
   const listaTareas = document.getElementById("listaTareasPendientes");
   const listaTecnicos = document.getElementById("listaTecnicosPendientes");
 
@@ -344,30 +319,49 @@ function renderTabla(){
     `;
   });
 }
+
 function graficas(data){
-  new Chart(document.getElementById("graficaEstados"), {
+  // Destruir gráficos anteriores si existen para evitar duplicación en memoria
+  if(chartEstados) chartEstados.destroy();
+  if(chartCargos) chartCargos.destroy();
+
+  chartEstados = new Chart(document.getElementById("graficaEstados"), {
     type:"doughnut",
     data:{
       labels:["Vigentes","Vencidas","Pendientes","Próximas"],
       datasets:[{
-        data:[data.vigente,data.vencida,data.pendiente,data.proxima]
+        data:[data.vigente || 0, data.vencida || 0, data.pendiente || 0, data.proxima || 0],
+        backgroundColor: ["#c8f7c5", "#ffc7c7", "#ddd", "#fff3b0"],
+        borderColor: ["#1e4620", "#7a1c1c", "#444", "#7a6500"],
+        borderWidth: 1
       }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
     }
   });
 
-  new Chart(document.getElementById("graficaCargos"), {
+  const listaCargos = data.cargos || [];
+  chartCargos = new Chart(document.getElementById("graficaCargos"), {
     type:"bar",
     data:{
-      labels:data.cargos.map(c => c.cargo),
+      labels: listaCargos.map(c => c.cargo),
       datasets:[{
         label:"% Cumplimiento",
-        data:data.cargos.map(c => c.porcentaje)
+        data: listaCargos.map(c => c.porcentaje),
+        backgroundColor: "#0b2340",
+        borderRadius: 6
       }]
     },
-    options:{scales:{y:{beginAtZero:true,max:100}}}
+    options:{
+      responsive: true,
+      maintainAspectRatio: false,
+      scales:{
+        y:{beginAtZero:true, max:100}
+      }
+    }
   });
-
-
 }
 </script>
 
