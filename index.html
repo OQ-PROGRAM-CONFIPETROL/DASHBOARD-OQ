@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard OQ Confipetrol</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Cargar el plugin para mostrar porcentajes/etiquetas dentro de las gráficas -->
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   
   <style>
     body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b2340;color:#fff;padding:20px}
@@ -198,14 +197,12 @@
 </div>
 
 <script>
-// URL del Web App de Google Apps Script
 const API = "https://script.google.com/macros/s/AKfycbxbzO1J8Dl0v4_NZ624FL9U7i4uIZzFhztAft7eyOWyQoGdR59VCxlpjUwrmgbIkZcKYA/exec";
 
 let detallesGlobal = [];
 let chartEstados = null;
 let chartCargos = null;
 
-// Carga de datos inicial desde la API
 fetch(API + "?dashboard=cumplimiento")
 .then(r => {
   if(!r.ok) throw new Error("Error en respuesta de red.");
@@ -329,6 +326,7 @@ function graficas(data){
   if(chartEstados) chartEstados.destroy();
   if(chartCargos) chartCargos.destroy();
 
+  // --- 1. CONFIGURACIÓN GRÁFICA DE DONA (CON PORCENTAJES) ---
   chartEstados = new Chart(document.getElementById("graficaEstados"), {
     type:"doughnut",
     data:{
@@ -340,31 +338,26 @@ function graficas(data){
         borderWidth: 1
       }]
     },
-    // 1. REGISTRAMOS EL PLUGIN ESPECÍFICAMENTE EN ESTA GRÁFICA
-    plugins: [ChartDataLabels],
+    plugins: [ChartDataLabels], // Activa el plugin de etiquetas para la dona
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      // 2. CONFIGURAMOS LAS ETIQUETAS DE PORCENTAJE
       plugins: {
         legend: {
-          display: true // Mantiene tu leyenda superior intacta
+          display: true
         },
         datalabels: {
-          color: '#222222', // Color de la fuente del porcentaje
+          color: '#111111',
           font: {
             weight: 'bold',
             size: 11
           },
-          // Función para calcular el % dinámico basado en la suma total
           formatter: (value, ctx) => {
             let sum = 0;
             let dataArr = ctx.chart.data.datasets[0].data;
             dataArr.map(data => {
               sum += data;
             });
-            
-            // Si la rebanada tiene datos (> 0), muestra el porcentaje. Si es 0, lo oculta.
             if (value > 0) {
               let percentage = (value * 100 / sum).toFixed(1) + "%";
               return percentage;
@@ -372,16 +365,14 @@ function graficas(data){
               return null; 
             }
           },
-          anchor: 'center', // Lo ubica en el centro de la sección de color
+          anchor: 'center',
           align: 'center'
         }
       }
     }
   });
 
-  // ... (Aquí abajo sigue la lógica de tu chartCargos sin cambios)
-}
-
+  // --- 2. CONFIGURACIÓN GRÁFICA DE BARRAS POR CARGOS ---
   const listaCargos = data.cargos || [];
   chartCargos = new Chart(document.getElementById("graficaCargos"), {
     type:"bar",
@@ -399,6 +390,12 @@ function graficas(data){
       maintainAspectRatio: false,
       scales:{
         y:{beginAtZero:true, max:100}
+      },
+      plugins: {
+        // Desactivamos los porcentajes en esta gráfica para que no ensucie las barras
+        datalabels: {
+          display: false 
+        }
       }
     }
   });
