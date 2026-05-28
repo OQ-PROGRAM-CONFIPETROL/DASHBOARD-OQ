@@ -45,7 +45,6 @@
     th,td{border:1px solid #ddd;padding:8px;font-size:13px;text-align:left}
     th{background:#0b2340;color:#fff}
     
-    /* Estilos Corregidos de Badges para Contraste */
     .badge{padding:4px 8px;border-radius:8px;font-weight:bold;display:inline-block;color:#111}
     .VIGENTE{background:#c8f7c5;color:#1e4620}
     .VENCIDA{background:#ffc7c7;color:#7a1c1c}
@@ -237,6 +236,7 @@ fetch(API + "?dashboard=cumplimiento")
 
 function cargarCargos(detalles){
   const select = document.getElementById("filtroCargo");
+  select.innerHTML = '<option value="">Todos los cargos</option>';
   const cargos = [...new Set(detalles.map(d => d.cargo).filter(Boolean))].sort();
 
   cargos.forEach(c => {
@@ -272,11 +272,10 @@ function renderTabla(){
   });
 
   filtrados.forEach(d => {
-    const cert = d.certified || d.certificado
-      ? `<a href="${d.certified || d.certificado}" target="_blank" style="color:#0b2340; font-weight:bold;">Ver</a>`
+    const cert = d.certificado || d.certified
+      ? `<a href="${d.certificado || d.certified}" target="_blank" style="color:#0b2340; font-weight:bold;">Ver</a>`
       : "—";
 
-    // Manejo correcto de la clase CSS según el estado de la API de texto
     let clase = "PENDIENTE";
     if (d.estado === "VIGENTE") clase = "VIGENTE";
     if (d.estado === "VENCIDA") clase = "VENCIDA";
