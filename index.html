@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard OQ Confipetrol</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<!-- Cargar el plugin para mostrar porcentajes/etiquetas dentro de las gráficas -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  
   <style>
     body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#0b2340;color:#fff;padding:20px}
     h1{text-align:center;margin:10px 0 25px}
@@ -338,11 +340,47 @@ function graficas(data){
         borderWidth: 1
       }]
     },
+    // 1. REGISTRAMOS EL PLUGIN ESPECÍFICAMENTE EN ESTA GRÁFICA
+    plugins: [ChartDataLabels],
     options: {
       responsive: true,
-      maintainAspectRatio: false
+      maintainAspectRatio: false,
+      // 2. CONFIGURAMOS LAS ETIQUETAS DE PORCENTAJE
+      plugins: {
+        legend: {
+          display: true // Mantiene tu leyenda superior intacta
+        },
+        datalabels: {
+          color: '#222222', // Color de la fuente del porcentaje
+          font: {
+            weight: 'bold',
+            size: 11
+          },
+          // Función para calcular el % dinámico basado en la suma total
+          formatter: (value, ctx) => {
+            let sum = 0;
+            let dataArr = ctx.chart.data.datasets[0].data;
+            dataArr.map(data => {
+              sum += data;
+            });
+            
+            // Si la rebanada tiene datos (> 0), muestra el porcentaje. Si es 0, lo oculta.
+            if (value > 0) {
+              let percentage = (value * 100 / sum).toFixed(1) + "%";
+              return percentage;
+            } else {
+              return null; 
+            }
+          },
+          anchor: 'center', // Lo ubica en el centro de la sección de color
+          align: 'center'
+        }
+      }
     }
   });
+
+  // ... (Aquí abajo sigue la lógica de tu chartCargos sin cambios)
+}
 
   const listaCargos = data.cargos || [];
   chartCargos = new Chart(document.getElementById("graficaCargos"), {
