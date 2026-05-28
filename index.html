@@ -276,7 +276,11 @@ function renderTabla(){
       ? `<a href="${d.certified || d.certificado}" target="_blank" style="color:#0b2340; font-weight:bold;">Ver</a>`
       : "—";
 
-    const clase = d.estado === "PROXIMA A VENCER" ? "PROXIMA" : d.estado;
+    // Manejo correcto de la clase CSS según el estado de la API de texto
+    let clase = "PENDIENTE";
+    if (d.estado === "VIGENTE") clase = "VIGENTE";
+    if (d.estado === "VENCIDA") clase = "VENCIDA";
+    if (d.estado === "PROXIMA A VENCER") clase = "PROXIMA";
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -287,7 +291,7 @@ function renderTabla(){
       <td><strong>${d.cumple}</strong></td>
       <td>${d.fecha || "—"}</td>
       <td>${d.fechaVencimiento || "—"}</td>
-      <td><span class="badge ${clase}">${d.estado}</span></td>
+      <td><span class="badge ${clase}">${d.estado || "PENDIENTE"}</span></td>
       <td>${cert}</td>
     `;
     tbody.appendChild(tr);
@@ -295,14 +299,14 @@ function renderTabla(){
 }
 
 function renderRankings(data){
-  const listaTareas = document.getElementById("listaTareasPendientes");
-  const listaTecnicos = document.getElementById("listaTecnicosPendientes");
+  const metaTareas = document.getElementById("listaTareasPendientes");
+  const metaTecnicos = document.getElementById("listaTecnicosPendientes");
 
-  listaTareas.innerHTML = "";
-  listaTecnicos.innerHTML = "";
+  metaTareas.innerHTML = "";
+  metaTecnicos.innerHTML = "";
 
   (data.topTareasPendientes || []).forEach((item, index) => {
-    listaTareas.innerHTML += `
+    metaTareas.innerHTML += `
       <div class="rankItem">
         <strong>${index + 1}. ${item.tarea}</strong>
         <span>${item.total} pendientes</span>
@@ -311,7 +315,7 @@ function renderRankings(data){
   });
 
   (data.topTecnicosPendientes || []).forEach((item, index) => {
-    listaTecnicos.innerHTML += `
+    metaTecnicos.innerHTML += `
       <div class="rankItem">
         <strong>${index + 1}. ${item.nombre}</strong>
         <span>${item.total} pendientes</span>
@@ -321,7 +325,6 @@ function renderRankings(data){
 }
 
 function graficas(data){
-  // Destruir gráficos anteriores si existen para evitar duplicación en memoria
   if(chartEstados) chartEstados.destroy();
   if(chartCargos) chartCargos.destroy();
 
